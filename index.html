@@ -1,34 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>AR.js Location Based</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Frame Native WebXR Hit Test</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- A-Frame -->
-  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script>
+        // component to handle the "reticle" (the target ring) and spawning objects
+        AFRAME.registerComponent('ar-hit-test', {
+            init: function () {
+                this.reticle = this.el;
+                this.isVisible = false;
+                
+                // Hide reticle specifically when entering/exiting AR to be clean
+                this.el.sceneEl.addEventListener('enter-vr', () => {
+                    if (this.el.sceneEl.is('ar-mode')) {
+                        this.isVisible = true;
+                        this.reticle.setAttribute('visible', 'true');
+                    }
+                });
+                this.el.sceneEl.addEventListener('exit-vr', () => {
+                    this.isVisible = false;
+                    this.reticle.setAttribute('visible', 'false');
+                });
 
-  <!-- AR.js Location build -->
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar-location-only.js"></script>
+                // Listen for the "select" event (tap on screen)
+                this.el.sceneEl.addEventListener('ar-hit-test-select', (e) => {
+                    // Create a new cylinder/box at the reticle location
+                    const spawn = document.createElement('a-cylinder');
+                    spawn.setAttribute('position', this.reticle.getAttribute('position'));
+                    spawn.setAttribute('rotation', this.reticle.getAttribute('rotation'));
+                    spawn.setAttribute('height', '0.5');
+                    spawn.setAttribute('radius', '0.1');
+                    spawn.setAttribute('color', '#4CC3D9');
+                    spawn.setAttribute('material', 'opacity: 0.8');
+                    this.el.sceneEl.appendChild(spawn);
+                });
+            }
+        });
+    </script>
 </head>
 
-<body style="margin:0; overflow:hidden;">
-  
-  <a-scene
-    vr-mode-ui="enabled: false"
-    embedded
-    arjs="sourceType: webcam; debugUIEnabled: false;">
+<body>
+    <a-scene webxr="optionalFeatures: hit-test, dom-overlay; overlayElement: #overlay">
+        
+        <a-entity ar-hit-test
+                  ar-hit-test-target="target: #reticle"
+                  id="reticle"
+                  position="0 0 0" 
+                  visible="false">
+            <a-ring rotation="-90 0 0" radius-inner="0.05" radius-outer="0.08" color="yellow"></a-ring>
+        </a-entity>
 
-    <a-camera gps-camera rotation-reader></a-camera>
+        <a-light type="directional" intensity="1" position="-1 2 1"></a-light>
+        <a-light type="ambient" intensity="0.5"></a-light>
 
-    <!-- Replace with your latitude & longitude -->
-    <a-box
-      gps-entity-place="latitude: 13.0827; longitude: 80.2707;"
-      color="red"
-      scale="5 5 5">
-    </a-box>
+        <div id="overlay"></div>
 
-  </a-scene>
-
+    </a-scene>
 </body>
 </html>
