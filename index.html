@@ -1,16 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <title>Markerless AR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Core</title>
-    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@master/dist/aframe-master.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/chenzlabs/aframe-ar@master/dist/aframe-ar.min.js"></script>
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
 </head>
 
-<body>
-<a-scene ar>
-    <a-box color="red" scale="0.2 0.2 0.2"></a-box>
+<body style="margin:0; overflow:hidden;">
+
+<a-scene
+    xr-mode-ui="enabled: true"
+    webxr="requiredFeatures: hit-test, local-floor;"
+    vr-mode-ui="enabled: false"
+    renderer="colorManagement: true;"
+    embedded>
+
+    <!-- Camera -->
+    <a-camera position="0 1.6 0"></a-camera>
+
+    <!-- Light -->
+    <a-light type="directional" position="0 1 1"></a-light>
+
+    <!-- Box in front of camera -->
+    <a-box 
+        position="0 0 -2"
+        color="red"
+        scale="0.5 0.5 0.5">
+    </a-box>
+
 </a-scene>
+
 </body>
 </html>
